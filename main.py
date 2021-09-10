@@ -6,7 +6,6 @@ from replit import db
 from keep_alive import keep_alive
 from discord.ext import commands
 import youtube_dl
-import os
 
 client = discord.Client()
 
@@ -77,33 +76,28 @@ client = commands.Bot(command_prefix="!")
 
 @client.command()
 async def play (ctx, url: str):
-  song_temp = os.path.isfile("song.mp3")
+  song_temp = os.path.isfile("song.webm")
   try:
     if song_temp:
-      os.remove("song.mp3")
+      os.remove("song.webm")
   except PermissionError:
     await ctx.send("Wait for the current playing music to end or use the 'stop' command")
     return
-  voiceChannel = discord.utils.get(ctx.guild.voice_channels, name='General')
+  #voiceChannel = discord.utils.get(ctx.guild.voice_channels, name='General')
 
-  await voiceChannel.connect()
+  await ctx.author.voice.channel.connect()
   voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     
 
   ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-      'key': 'FFmpegExtractAudio',
-      'preferredcodec': 'mp3',
-      'preferredquality': '192',
-    }],
+    'format': '249/250/251',
   }
   with youtube_dl.YoutubeDL(ydl_opts) as ydl:
     ydl.download([url])
   for file in os.listdir("./"):
-    if file.endswith(".mp3"):
-      os.rename(file, "song.mp3")
-  voice.play(discord.FFmpegPCMAudio("song.mp3"))
+    if file.endswith(".webm"):
+      os.rename(file, "song.webm")
+  voice.play(discord.FFmpegOpusAudio("song.webm"))
 
 @client.command()
 async def leave(ctx):
